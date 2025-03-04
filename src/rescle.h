@@ -163,6 +163,10 @@ class ResourceUpdater {
   StringTableMap stringTableMap_;
   IconTableMap iconBundleMap_;
   RcDataLangMap rcDataLngMap_;
+
+public:
+  static LANGID kCodePageEnUs;
+  static LANGID kLangEnUs;
 };
 
 class ScopedResourceUpdater {

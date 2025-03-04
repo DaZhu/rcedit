@@ -56,7 +56,8 @@ void print_help(VS_FIXEDFILEINFO* file_info) {
 "  --application-manifest <path-to-file>      Set manifest file\n"
 "  --set-resource-string <key> <value>        Set resource string\n"
 "  --get-resource-string <key>                Get resource string\n"
-"  --set-rcdata <key> <path-to-file>          Replace RCDATA by integer id\n",
+"  --set-rcdata <key> <path-to-file>          Replace RCDATA by integer id\n"
+"  --set-language <valuie>                    Set Language Code and Page",
 (file_info->dwProductVersionMS >> 16) & 0xff,
 (file_info->dwProductVersionMS >>  0) & 0xff,
 (file_info->dwProductVersionLS >> 16) & 0xff);
@@ -100,6 +101,25 @@ int wmain(int argc, const wchar_t* argv[]) {
     print_help(file_info);
     return 0;
   }
+
+
+  for (int i = 1; i < argc; ++i)
+  {
+     if (wcscmp(argv[i], L"--set-language") == 0)
+    {
+      const wchar_t* lang = argv[++i];
+      if (wcslen(lang) != 8)
+      {
+        return print_error("Invalid language");
+      }
+
+
+      unsigned int langCode = (unsigned int)wcstol(lang, NULL, 16);
+      rescle::ResourceUpdater::kLangEnUs = (WORD)(langCode >> 16);
+      rescle::ResourceUpdater::kCodePageEnUs = (WORD)(langCode & 0xffff);
+    }
+  }
+
 
   for (int i = 1; i < argc; ++i) {
     if (wcscmp(argv[i], L"--set-version-string") == 0 ||
@@ -227,7 +247,12 @@ int wmain(int argc, const wchar_t* argv[]) {
       fwprintf(stdout, L"%s", result);
       return 0;  // no changes made
 
-    } else {
+    }
+    else  if (wcscmp(argv[i], L"--set-language") == 0)
+    {
+    i++;
+    }
+    else {
       if (loaded) {
         fprintf(stderr, "Unrecognized argument: \"%ls\"\n", argv[i]);
         return 1;

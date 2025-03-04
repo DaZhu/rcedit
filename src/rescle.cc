@@ -17,6 +17,9 @@
 
 namespace rescle {
 
+ LANGID ResourceUpdater::kLangEnUs = 1033;
+ LANGID ResourceUpdater::kCodePageEnUs = 1200;
+
 namespace {
 
 #pragma pack(push,2)
@@ -74,8 +77,6 @@ typedef struct _VS_VERSION_ROOT {
 #pragma pack(pop)
 
 // The default en-us LANGID.
-LANGID kLangEnUs = 1033;
-LANGID kCodePageEnUs = 1200;
 UINT   kDefaultIconBundle = 0;
 
 template<typename T>
@@ -189,7 +190,8 @@ std::vector<BYTE> VersionInfo::Serialize() const {
       stringTableRaw.valueLength = 0;
 
       {
-        auto& translate = iTable.encoding;
+        //auto& translate = iTable.encoding;
+        Translate translate = { ResourceUpdater::kLangEnUs, ResourceUpdater::kCodePageEnUs };
         std::wstringstream ss;
         ss << std::hex << std::setw(8) << std::setfill(L'0') << (translate.wLanguage << 16 | translate.wCodePage);
         stringTableRaw.key = ss.str();
@@ -238,7 +240,8 @@ std::vector<BYTE> VersionInfo::Serialize() const {
         dst.resize(supportedTranslations.size() * newValueSize);
 
         for (auto iVar = 0; iVar < supportedTranslations.size(); ++iVar) {
-          auto& translate = supportedTranslations[iVar];
+          //auto& translate = supportedTranslations[iVar];
+          Translate translate = { ResourceUpdater::kLangEnUs, ResourceUpdater::kCodePageEnUs };
           auto var = DWORD(translate.wCodePage) << 16 | translate.wLanguage;
           memcpy(&dst[iVar * newValueSize], &var, newValueSize);
         }
@@ -257,7 +260,7 @@ std::vector<BYTE> VersionInfo::Serialize() const {
 
 void VersionInfo::FillDefaultData() {
   if (stringTables.empty()) {
-    Translate enUsTranslate = {kLangEnUs, kCodePageEnUs};
+    Translate enUsTranslate = { ResourceUpdater::kLangEnUs, ResourceUpdater::kCodePageEnUs};
     stringTables.push_back({enUsTranslate});
     supportedTranslations.push_back(enUsTranslate);
   }
