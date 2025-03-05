@@ -89,3 +89,11 @@ Get resource string:
 ```bash
 $ rcedit "path-to-exe-or-dll" --get-resource-string id_number
 ```
+
+Set language
+
+Codes from <https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource#langID>
+
+``` bash 
+$ rcedit --set-language 040904B0 
+```
